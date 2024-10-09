@@ -2,6 +2,7 @@ import pandas as pd
 from preprocessing import preprocess_for_tfidf, preprocess_for_bert
 from tfidf_index import TFIDFIndexer
 from bert_index import BERTIndexer
+from typing import List
 
 
 class SearchAndLoad:
@@ -9,11 +10,12 @@ class SearchAndLoad:
         self.data_path = data_path
         self.tfidf_indexer = TFIDFIndexer(tfidf_path)
         self.bert_indexer = BERTIndexer(bert_path)
+        self.documents = []
 
     def load_data(self):
         """Загружает данные из CSV файла и сохраняет в память."""
         df = pd.read_csv(self.data_path)
-        self.documents = df['full_text'].tolist()  # Тексты песен остаются в оригинале
+        self.documents = df['full_text'].tolist()
 
     def build_indexes(self):
         """Строит оба индекса и сохраняет их."""
@@ -25,7 +27,7 @@ class SearchAndLoad:
         processed_texts_bert = [preprocess_for_bert(doc) for doc in self.documents]
         self.bert_indexer.build_index(processed_texts_bert)
 
-    def search(self, query: str, index_type: str = 'tf-idf', top_n: int = 5):
+    def search(self, query: str, index_type: str = 'tf-idf', top_n: int = 5) -> List[str]:
         """
         Выполняет поиск по заданному индексу.
 
@@ -42,3 +44,4 @@ class SearchAndLoad:
             return self.bert_indexer.search(processed_query, top_n)
         else:
             raise ValueError("Неверный тип индекса. Используйте 'tf-idf' или 'bert'.")
+

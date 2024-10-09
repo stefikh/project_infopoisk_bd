@@ -3,6 +3,7 @@ import torch
 import numpy as np
 from transformers import BertModel, BertTokenizer
 from typing import List
+from tqdm import tqdm
 
 
 class BERTIndexer:
@@ -19,9 +20,9 @@ class BERTIndexer:
         :param texts: Список текстов для индексации
         """
         embeddings = []
-        for text in texts:
-            inputs = self.tokenizer(text, return_tensors='pt', truncation=True, padding='max_length', max_length=512)  # Максимальная
-            # длина последовательности + берём pytorch
+        for text in tqdm(texts):
+            # Максимальная длина последовательности + берём pytorch
+            inputs = self.tokenizer(text, return_tensors='pt', truncation=True, padding='max_length', max_length=512)
             outputs = self.model(**inputs)
             embeddings.append(outputs.pooler_output.detach().numpy())
 

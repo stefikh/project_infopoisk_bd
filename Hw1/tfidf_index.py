@@ -1,6 +1,7 @@
 import pickle # Для сохранения и загрузки индексов
 from sklearn.feature_extraction.text import TfidfVectorizer
 from typing import List
+from tqdm import tqdm
 
 
 class TFIDFIndexer:
@@ -16,10 +17,13 @@ class TFIDFIndexer:
 
     def build_index(self, texts: List[str]):
         """
-        Строит TF-IDF для списка текстов и сохраняет его. Сохраняет также векторайзер.
+        Строит TF-IDF для списка текстов и сохраняет его. Сохраняет также векторайзер. На это уходит минут 20-30.
 
         :param texts: Список текстов для индексации
         """
+        for _ in tqdm(range(len(texts))):
+            pass # Для отображения прогресса
+
         self.index = self.vectorizer.fit_transform(texts)
         with open(self.save_path, 'wb') as f:
             pickle.dump((self.vectorizer, self.index), f)
@@ -27,7 +31,7 @@ class TFIDFIndexer:
     def load_index(self):
         """Загружает индекс и векторайзер, который был сохранён."""
         with open(self.save_path, 'rb') as f:
-            self.index, self.vectorizer = pickle.load(f)
+            self.vectorizer, self.index = pickle.load(f)
 
     def search(self, query: str, top_n: int = 5) -> List[int]:
         """
